@@ -10,6 +10,7 @@ public class Main {
 		try {
 			ConexionDB.useDATABASE();
 			menu();
+			System.out.println("Adios");
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -22,8 +23,8 @@ public class Main {
 
 		while (opc != 0) {
 			System.out.println("1. Crear tablas ");
-			System.out.println("2. Insertar personas en la tabla ");
-			System.out.println("3. Listado personas por edad ");
+			System.out.println("2. Insertar datos en las tablas ");
+			System.out.println("3. Listado de datos de las tablas ");
 			System.out.println("0. Salir ");
 			opc = sc.nextInt();
 			sc.nextLine();
@@ -140,5 +141,61 @@ public class Main {
 			}
 			}
 	}// insertar
+	
+	// funcion que se encarga de preguntar al usuario por la consulta que quiere realizar
+	static void listarElementos() {
+		int opc;
+		System.out.println("1. Tabla Mesa ");
+		System.out.println("2. Tabla Productos ");
+		System.out.println("3. Tabla Factura ");
+		System.out.println("4. Tabla Pedido ");
+		System.out.println("0. Salir ");
+		System.out.println("¿De que tabla quieres realizar la consulta? ");
+		opc = sc.nextInt();
+		sc.nextLine();
+		
+		switch (opc) {
+		case 1: {
+			selectMesa();
+			break;
+		}
+		default:
+			System.out.println("Opción no válida");
+		}		
+	}// funcion inserts
+
+	private static void selectMesa() {
+		int opcMesa;
+		System.out.println("1. Por idMesa ");
+		System.out.println("2. Por número de comensales");
+		System.out.println("3. Por reserva ");
+		System.out.println("Elige la columna para filtrar los datos ");
+		opcMesa = sc.nextInt();
+		switch (opcMesa) {
+		case 1: {
+			System.out.println("Inserta el id de la mesa ");
+			int idMesa = sc.nextInt();
+			// TODO Funcion select Mesa
+			break;
+		}
+		case 2:{
+			System.out.println("Inserta el número de comensales ");
+			int numComensales = sc.nextInt();
+			// TODO funcion select Mesa
+		}
+		case 3:{
+			System.out.println("Buscar por mesas con reserva? S/N");
+			String siNo = sc.next();
+			sc.nextLine();
+			Boolean reserva = (siNo.equalsIgnoreCase("s"))? true : false;
+			// TODO funcion select Mesa
+		}
+		
+		}// switch Mesa
+	}
+	
+	// TODO Funcion para imprimir los datos de las consultas (2 sobrecargas: para listas y para elementos sueltos)
+
+	
 
 }
