@@ -9,6 +9,7 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.sql.SQLSyntaxErrorException;
 import java.sql.Statement;
 
 public class MetodosDataBase {
@@ -201,43 +202,145 @@ public class MetodosDataBase {
 	}
 
 	// funcion para realizar las consultas de la tabla mesa
-	public static void listadoMesa(String Columna, int datoFiltrar) throws SQLException {
+	public static void listadoMesa(String Columna, String datoFiltrar) throws SQLException, SQLSyntaxErrorException, ClassNotFoundException {
+		Connection conn = null;
+		Statement stmt = null;
+		ResultSet lista = null;
+		String sql = "";
 
+		conn = ConexionDB.conectar();
+		stmt = conn.createStatement();
+
+		if (datoFiltrar == null || datoFiltrar.equals("")) {
+			sql = "SELECT * FROM Mesa";
+		} else {
+			sql = "SELECT * FROM Mesa WHERE " + Columna + " = " + datoFiltrar;
+		}
+
+		lista = stmt.executeQuery(sql);
+
+		ResultSetMetaData metaData = lista.getMetaData();
+		int columnCount = metaData.getColumnCount();
+
+		while (lista.next()) {
+			// Recorrer todas las columnas de la fila actual
+			System.out.println("----------------------------");
+			for (int col = 1; col <= columnCount; col++) {
+				System.out.print(metaData.getColumnName(col) + ": " + lista.getString(col) + "\n");
+			} // for
+				// salto de linea
+			System.out.println();
+		} // while
+
+		// Paso 5. Cerrar el objeto en uso y la conexión
+		stmt.close();
+		conn.close();
+
+	}// listadoMesa
+
+	public static void listadoProductos(String columna, String datoFiltrar) throws SQLException, SQLSyntaxErrorException, ClassNotFoundException {
 		Connection conn = null;
 		Statement stmt = null;
 		ResultSet lista = null;
 		String sql = "";
 		int i = 0;
 
-		try {
-			conn = ConexionDB.conectar();
-			stmt = conn.createStatement();
-			if (datoFiltrar == -1) {
-				sql = "SELECT * FROM Mesa";
-			}
-			else {
-				sql = "SELECT * FROM Mesa WHERE" + Columna + " = " + datoFiltrar; 
-			}
-			
-			lista = stmt.executeQuery(sql);
-			
-			ResultSetMetaData metaData = lista.getMetaData();
-	        int columnCount = metaData.getColumnCount();
-
-			 while (lista.next()) {
-		            // Recorrer todas las columnas de la fila actual
-		            for (int col = 1; col <= columnCount; col++) {
-		                System.out.print(metaData.getColumnName(col) + ": " + lista.getString(col) + " | ");
-		            }
-		            System.out.println(); // Salto de línea después de cada fila
-		        }
-		} catch (Exception e) {
-			e.printStackTrace();
-		} finally {
-			// Paso 5. Cerrar el objeto en uso y la conexión
-			stmt.close();
-			conn.close();
+		conn = ConexionDB.conectar();
+		stmt = conn.createStatement();
+		if (datoFiltrar == null) {
+			sql = "SELECT * FROM Productos";
+		} else {
+			sql = "SELECT * FROM Productos WHERE " + columna + " = " + datoFiltrar;
 		}
 
-	}
+		lista = stmt.executeQuery(sql);
+
+		ResultSetMetaData metaData = lista.getMetaData();
+		int columnCount = metaData.getColumnCount();
+
+		while (lista.next()) {
+			// Recorrer todas las columnas de la fila actual
+			System.out.println("----------------------------");
+			for (int col = 1; col <= columnCount; col++) {
+				System.out.print(metaData.getColumnName(col) + ": " + lista.getString(col) + "\n");
+			} // for
+				// salto de linea
+			System.out.println();
+		} // while
+
+		// Paso 5. Cerrar el objeto en uso y la conexión
+		stmt.close();
+		conn.close();
+
+	}// listado productos
+
+	public static void listadoFactura(String columna, String datoFiltrar) throws SQLException, SQLSyntaxErrorException, ClassNotFoundException {
+		Connection conn = null;
+		Statement stmt = null;
+		ResultSet lista = null;
+		String sql = "";
+		int i = 0;
+
+		conn = ConexionDB.conectar();
+		stmt = conn.createStatement();
+		if (datoFiltrar == null) {
+			sql = "SELECT * FROM Factura";
+		} else {
+			sql = "SELECT * FROM Factura WHERE " + columna + " = " + datoFiltrar;
+		}
+
+		lista = stmt.executeQuery(sql);
+
+		ResultSetMetaData metaData = lista.getMetaData();
+		int columnCount = metaData.getColumnCount();
+
+		while (lista.next()) {
+			// Recorrer todas las columnas de la fila actual
+			System.out.println("----------------------------");
+			for (int col = 1; col <= columnCount; col++) {
+				System.out.print(metaData.getColumnName(col) + ": " + lista.getString(col) + "\n");
+			} // for
+			System.out.println();
+		} // while
+
+		// Paso 5. Cerrar el objeto en uso y la conexión
+		stmt.close();
+		conn.close();
+
+	}// listaFactura
+
+	public static void listadoPedido(String columna, String datoFiltrar) throws SQLException, SQLSyntaxErrorException, ClassNotFoundException {
+		Connection conn = null;
+		Statement stmt = null;
+		ResultSet lista = null;
+		String sql = "";
+
+		conn = ConexionDB.conectar();
+		stmt = conn.createStatement();
+		if (datoFiltrar == null) {
+			sql = "SELECT * FROM Pedido";
+		} else {
+			sql = "SELECT * FROM Pedido WHERE " + columna + " = " + datoFiltrar;
+		}
+
+		lista = stmt.executeQuery(sql);
+
+		ResultSetMetaData metaData = lista.getMetaData();
+		int columnCount = metaData.getColumnCount();
+
+		while (lista.next()) {
+			// Recorrer todas las columnas de la fila actual
+			System.out.println("----------------------------");
+			for (int col = 1; col <= columnCount; col++) {
+				System.out.print(metaData.getColumnName(col) + ": " + lista.getString(col) + "\n");
+			} // for
+			System.out.println();
+		} // while
+
+		// Paso 5. Cerrar el objeto en uso y la conexión
+		stmt.close();
+		conn.close();
+
+	}// listado pedidos
+
 }
