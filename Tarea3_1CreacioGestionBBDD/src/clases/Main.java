@@ -193,6 +193,7 @@ public class Main {
 	// funcines para realizar los select en la base de datos
 	private static void selectMesa() {
 		int opcMesa;
+		String comparador;
 		System.out.println("1. Todas las filas");
 		System.out.println("2. Por idMesa ");
 		System.out.println("3. Por número de comensales");
@@ -206,20 +207,34 @@ public class Main {
 			switch (opcMesa) {
 			case 1:{
 				// se llama al metodo que lista las mesas con los parametros con valores predetrmindos
-				MetodosDataBase.listadoMesa("", null);
+				MetodosDataBase.listadoMesa("", null, "");
 				break;
 			}
 			case 2: {
 				System.out.println("Inserta el id de la mesa ");
 				String idMesa = sc.nextLine();
-				MetodosDataBase.listadoMesa("idMesa", idMesa);
+				
+				comparador = getComparadorDeseado();
+				
+				if (comparador.equals("LIKE")) {
+					System.out.println("Buscar un valor parecido no es posible en esta opción");
+				}
+				else {
+					MetodosDataBase.listadoMesa("idMesa", idMesa, comparador);
+				}
 				break;
 			}
 			case 3:{
 				System.out.println("Inserta el número de comensales ");
 				String numComensales = sc.nextLine();
-
-				MetodosDataBase.listadoMesa("numComensales", numComensales);
+				comparador = getComparadorDeseado();
+				if (comparador.equals("LIKE")) {
+					System.out.println("Buscar un valor parecido no es posible en esta opción");
+				}
+				else {
+					MetodosDataBase.listadoMesa("numComensales", numComensales, comparador);
+				}
+				
 				break;
 			}
 			case 4:{
@@ -227,7 +242,9 @@ public class Main {
 				String siNo = sc.next();
 				sc.nextLine();
 				String reserva = (siNo.equalsIgnoreCase("s"))? "1" : "0";
-				MetodosDataBase.listadoMesa("reserva", reserva);
+
+				MetodosDataBase.listadoMesa("reserva", reserva, "=");				
+				
 				break;
 			}	
 			}// switch Mesa
@@ -432,4 +449,36 @@ public class Main {
 			System.out.println("ERROR INESPERADO");
 		}
 	}// selectFacturas
+
+	private static String getComparadorDeseado() {
+		int opcOp;
+		String comparador = "=";
+		
+		System.out.println("1. Buscar igual que el valor introducido. ");
+		System.out.println("2. Buscar menor que el valor introducido. ");
+		System.out.println("3. Buscar mayor que el valor introducido. ");
+		System.out.println("4. Buscar parecido que el valor introducido. ");	
+		opcOp = sc.nextInt();
+		sc.nextLine();	
+		
+		switch (opcOp) {
+		case 1: {
+			comparador = "=";
+			break;
+		}
+		case 2: {
+			comparador = "<";
+			break;
+		}
+		case 3: {
+			comparador = ">";
+			break;
+		}
+		case 4: {
+			comparador = "LIKE";
+			break;
+		}
+		}// switch
+		return comparador;
+	}// get operador
 }

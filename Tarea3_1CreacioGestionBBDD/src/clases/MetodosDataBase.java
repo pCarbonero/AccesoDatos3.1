@@ -202,7 +202,7 @@ public class MetodosDataBase {
 	}
 
 	// funcion para realizar las consultas de la tabla mesa
-	public static void listadoMesa(String Columna, String datoFiltrar) throws SQLException, SQLSyntaxErrorException, ClassNotFoundException {
+	public static void listadoMesa(String Columna, String datoFiltrar, String operador) throws SQLException, SQLSyntaxErrorException, ClassNotFoundException {
 		Connection conn = null;
 		Statement stmt = null;
 		ResultSet lista = null;
@@ -214,7 +214,7 @@ public class MetodosDataBase {
 		if (datoFiltrar == null || datoFiltrar.equals("")) {
 			sql = "SELECT * FROM Mesa";
 		} else {
-			sql = "SELECT * FROM Mesa WHERE " + Columna + " = " + datoFiltrar;
+			sql = "SELECT * FROM Mesa WHERE " + Columna + "  " + operador +" " + datoFiltrar;
 		}
 
 		lista = stmt.executeQuery(sql);
