@@ -202,7 +202,7 @@ public class MetodosDataBase {
 	}
 
 	// funcion para realizar las consultas de la tabla mesa
-	public static void listadoMesa(String Columna, String datoFiltrar, String operador) throws SQLException, SQLSyntaxErrorException, ClassNotFoundException {
+	public static void listadoMesa(String Columna, String datoFiltrar, String comparador) throws SQLException, SQLSyntaxErrorException, ClassNotFoundException {
 		Connection conn = null;
 		Statement stmt = null;
 		ResultSet lista = null;
@@ -214,7 +214,7 @@ public class MetodosDataBase {
 		if (datoFiltrar == null || datoFiltrar.equals("")) {
 			sql = "SELECT * FROM Mesa";
 		} else {
-			sql = "SELECT * FROM Mesa WHERE " + Columna + "  " + operador +" " + datoFiltrar;
+			sql = "SELECT * FROM Mesa WHERE " + Columna + "  " + comparador +" " + datoFiltrar;
 		}
 
 		lista = stmt.executeQuery(sql);
@@ -238,7 +238,7 @@ public class MetodosDataBase {
 
 	}// listadoMesa
 
-	public static void listadoProductos(String columna, String datoFiltrar) throws SQLException, SQLSyntaxErrorException, ClassNotFoundException {
+	public static void listadoProductos(String columna, String datoFiltrar, String comparador) throws SQLException, SQLSyntaxErrorException, ClassNotFoundException {
 		Connection conn = null;
 		Statement stmt = null;
 		ResultSet lista = null;
@@ -250,7 +250,13 @@ public class MetodosDataBase {
 		if (datoFiltrar == null) {
 			sql = "SELECT * FROM Productos";
 		} else {
-			sql = "SELECT * FROM Productos WHERE " + columna + " = " + datoFiltrar;
+			if (comparador.equals("LIKE")) {
+				sql = "SELECT * FROM Productos WHERE " + columna + "  " + comparador +" " + "%"+datoFiltrar+"%";				
+			}
+			else {
+				sql = "SELECT * FROM Productos WHERE " + columna + "  " + comparador +" " + datoFiltrar;				
+			}
+
 		}
 
 		lista = stmt.executeQuery(sql);

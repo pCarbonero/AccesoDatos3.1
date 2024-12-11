@@ -265,6 +265,7 @@ public class Main {
 	
 	private static void selectProductos() throws SQLException{
 		int opcProductos;
+		String comparador;
 		System.out.println("1. Todas las filas");
 		System.out.println("2. Por idProduco ");
 		System.out.println("3. Por el nombre del producto");
@@ -276,28 +277,44 @@ public class Main {
 			switch (opcProductos) {
 			case 1:{
 				// se llama al metodo que lista las mesas con los parametros con valores predetrmindos
-				MetodosDataBase.listadoProductos("", null);
+				MetodosDataBase.listadoProductos("", null, "");
 				break;
 			}
 			case 2: {
 				System.out.println("Inserta el id del producto ");
-				String idProducto = sc.nextLine();
-
-				MetodosDataBase.listadoProductos("idProducto", idProducto);
+				String idProducto = sc.nextLine();			
+				comparador = getComparadorDeseado();
+				
+				if (comprobarComparador(comparador, "LIKE")) {
+					MetodosDataBase.listadoProductos("idProducto", idProducto, comparador);
+				}
+				else {
+					System.out.println("Buscar un valor parecido no es posible en esta opción");
+				}
+				
 				break;
 			}
 			case 3:{
 				System.out.println("Inserta el nombre del producto ");
 				String denominacion = sc.nextLine();
+				comparador = getComparadorDeseado();
+				
+				if (comprobarComparador(comparador, "<") && comprobarComparador(comparador, ">")) {
+					MetodosDataBase.listadoProductos("Denominacion", denominacion, comparador);
+				}
+				else {
+					System.out.println("Buscar un valor parecido no es posible en esta opción");
+				}
 
-				MetodosDataBase.listadoProductos("Denominacion", denominacion);
+				
 				break;
 			}
 			case 4:{
 				System.out.println("Inserta el precio del producto");
 				String precio = sc.nextLine();
+				comparador = getComparadorDeseado();
 
-				MetodosDataBase.listadoProductos("Precio", precio);
+				MetodosDataBase.listadoProductos("Precio", precio, comparador);
 				break;
 			}		
 			}// switch Productos
@@ -362,14 +379,14 @@ public class Main {
 					tipoPago = "tarjeta";
 				}
 						
-				MetodosDataBase.listadoProductos("tipoPago", tipoPago);
+				MetodosDataBase.listadoFactura("tipoPago", tipoPago);
 				break;
 			}	
 			case 5:{
 				System.out.println("Inserta el importe");
 				String importe = sc.nextLine();
 
-				MetodosDataBase.listadoProductos("Importe", importe);
+				MetodosDataBase.listadoFactura("Importe", importe);
 				break;
 			}
 			}// switch Facturas
@@ -481,4 +498,16 @@ public class Main {
 		}// switch
 		return comparador;
 	}// get operador
+	
+	// Funcion que comprueba si el comparador que se va a utilizar en una query es valido para el tipo de datos
+	// Por ejemplo no permitiria que se usara un comparador LIKE para comparar valores numericos
+	private static Boolean comprobarComparador(String comparador, String comparadorNoValido) {
+		Boolean esValido = true;
+		
+		if (comparador.equals(comparadorNoValido)) {
+			esValido = false;
+		}
+		
+		return esValido;
+	}
 }
