@@ -5,12 +5,12 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.SQLSyntaxErrorException;
 import java.sql.Statement;
+import java.util.Scanner;
 
 public class MetodosDataBase {
 
@@ -348,5 +348,71 @@ public class MetodosDataBase {
 		conn.close();
 
 	}// listado pedidos
+	
+	
+	public static void modificar(String tabla, String columna, int id, String nuevoValor) throws SQLException, SQLSyntaxErrorException, ClassNotFoundException {
+		Connection conn = null;
+		Statement stmt = null;
+		ResultSet lista = null;
+		String sql = "";
+		int opc;
+		Scanner sc = new Scanner(System.in);
+		
+		String nombreId = switch(tabla) {
+			case "Mesa" -> "idMesa";
+			case "Productos" -> "idProducto";
+			case "Factura" -> "idFactura";
+			case "Pedido" -> "idPedido";
+			default -> throw new IllegalArgumentException("Unexpected value: " + tabla);
+		};
+		
+		
+		
+		conn = ConexionDB.conectar();
+		conn.setAutoCommit(false);
+		stmt = conn.createStatement();
+		sql =     "Update " + tabla
+				+ " Set " + columna + " = " + nuevoValor
+				+ " Where " + nombreId + " = " + id ;
+		lista = stmt.executeQuery(sql);
+		
+		sql = "Select * FROM " + tabla + "WHERE " + nombreId + " = " + id;
+
+		ResultSetMetaData metaData = lista.getMetaData();
+		int columnCount = metaData.getColumnCount();
+
+		while (lista.next()) {
+			// Recorrer todas las columnas de la fila actual
+			System.out.println("----------------------------");
+			for (int col = 1; col <= columnCount; col++) {
+				System.out.print(metaData.getColumnName(col) + ": " + lista.getString(col) + "\n");
+			} // for
+			System.out.println();
+		} // while
+		
+		System.out.println("1. Confirmar cambios ");
+		System.out.println("2. Deshacer cambios ");
+		System.out.println("Elige una opción ");
+		opc = sc.nextInt();
+		sc.nextLine();
+		
+		switch (opc) {
+		case 1: {
+			conn.commit();
+			break;
+		}
+		case 2: {
+			conn.rollback();
+			break;
+		}
+		default:
+			throw new IllegalArgumentException("Unexpected value: " + opc);
+		}
+
+		// Paso 5. Cerrar el objeto en uso y la conexión
+		stmt.close();
+		conn.close();
+		sc.close();
+	}
 
 }

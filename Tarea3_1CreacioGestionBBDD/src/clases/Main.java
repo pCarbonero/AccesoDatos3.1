@@ -180,15 +180,38 @@ public class Main {
 	}// funcion inserts
 
 	static void modificarElementos() {
+		int opc = 0;
 		
+		System.out.println("1. Tabla Mesa");
+		System.out.println("2. Tabla Productos");
+		System.out.println("3. Tabla Factura");
+		System.out.println("4. Tabla Pedido");
+		System.out.println("Elige sobre que tabla quieres realizar una modificacion ");
+		
+		switch (opc) {
+		case 1: {
+			
+			break;
+		}
+		case 2: {
+			
+			break;
+		}
+		case 3: {
+			
+			break;
+		}
+		case 4: {
+			
+			break;
+		}
+		default:
+			System.out.println("Opción no válida");
+		}
 	}
 	
 	
-	
-	
-	
-	
-	
+
 	
 	// funcines para realizar los select en la base de datos
 	private static void selectMesa() {
@@ -216,7 +239,7 @@ public class Main {
 				
 				comparador = getComparadorDeseado();
 				
-				if (comparador.equals("LIKE")) {
+				if (comprobarComparador(comparador, "LIKE")) {
 					System.out.println("Buscar un valor parecido no es posible en esta opción");
 				}
 				else {
@@ -510,4 +533,114 @@ public class Main {
 		
 		return esValido;
 	}
+
+
+	// FUNCIONES PARA REALIZAR LAS MODIFICACIONES
+	static void modificarMesa() {
+		int idMesa = 0;
+		int opcMesa = 0;
+		String nuevoValor;
+		System.out.println("Inserta el id del elemento a modificar");
+		idMesa = sc.nextInt();
+		sc.nextLine();
+		System.out.println("1. Numero de Comensales");
+		System.out.println("2. Reserva");
+		System.out.println("Inserta el valor a modificarr");
+		opcMesa = sc.nextInt();
+		sc.nextLine();
+		System.out.println("Inserta el nuevo valor");
+		nuevoValor = sc.nextLine();
+		
+		try {
+			switch (opcMesa) {
+			case 1: {
+				MetodosDataBase.modificar("Mesa", "numComensales", idMesa, nuevoValor);
+				break;
+			}
+			default:
+				System.out.println("Opción no válida");
+			}
+		}
+		catch(SQLSyntaxErrorException syntaxE) {
+			System.out.println("ERROR DE SINTAXIS, INSERTA BIEN LOS DATOS ");
+		}
+		catch(SQLException sqlE) {
+			System.out.println("ERROR SQL ");
+		}
+		catch(ClassNotFoundException connE) {
+			System.out.println("ERROR EN CONECTAR EN LA BASE DE DATOS ");
+		}
+		catch(Exception e) {
+			System.out.println("ERROR INESPERADO");
+		}
+	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
