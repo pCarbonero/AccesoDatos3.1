@@ -1,6 +1,7 @@
 package clases;
 
 import java.sql.SQLException;
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.sql.SQLSyntaxErrorException;
 import java.util.Scanner;
 
@@ -26,8 +27,11 @@ public class Main {
 			System.out.println("1. Crear tablas ");
 			System.out.println("2. Insertar datos en las tablas ");
 			System.out.println("3. Listado de datos de las tablas ");
+			System.out.println("4. Modificar datos de las tablas ");
+			System.out.println("5. Eliminar datos de las tablas ");
+			System.out.println("6. Borrar tablas ");
 			System.out.println("0. Salir ");
-			opc = sc.nextInt();
+			opc = sc.nextInt(); // aqui ocurre la excepcion (solo despues del metodo modificar que te pase
 			sc.nextLine();
 			
 			switch (opc) {
@@ -37,9 +41,23 @@ public class Main {
 			}
 			case 2: {
 				insertarDatos();
+				break;
 			}
 			case 3:{
 				listarElementos();
+				break;
+			}
+			case 4:{
+				modificarElementos();
+				break;
+			}
+			case 5:{
+				eliminarDatos();
+				break;
+			}
+			case 6:{
+				borrarTabla();
+				break;
 			}
 
 			}// switch
@@ -160,19 +178,19 @@ public class Main {
 		
 		switch (opc) {
 		case 1: {
-			selectMesa();
+			selectMesa(false);
 			break;
 		}
 		case 2:{
-			selectProductos();
+			selectProductos(false);
 			break;
 		}
 		case 3:{
-			selectFactura();
+			selectFactura(false);
 			break;
 		}
 		case 4:
-			selectPedido();
+			selectPedido(false);
 			break;
 		default:
 			System.out.println("Opción no válida");
@@ -187,22 +205,24 @@ public class Main {
 		System.out.println("3. Tabla Factura");
 		System.out.println("4. Tabla Pedido");
 		System.out.println("Elige sobre que tabla quieres realizar una modificacion ");
+		opc = sc.nextInt();
+		sc.nextLine();
 		
 		switch (opc) {
 		case 1: {
-			
+			modificarTabla("Mesa");
 			break;
 		}
 		case 2: {
-			
+			modificarTabla("Productos");
 			break;
 		}
 		case 3: {
-			
+			modificarTabla("Factura");
 			break;
 		}
 		case 4: {
-			
+			modificarTabla("Pedido");
 			break;
 		}
 		default:
@@ -213,8 +233,8 @@ public class Main {
 	
 
 	
-	// funcines para realizar los select en la base de datos
-	private static void selectMesa() {
+	// funcines para realizar los select y eliminar datos en la base de datos
+	private static void selectMesa(boolean isDelete) {
 		int opcMesa;
 		String comparador;
 		System.out.println("1. Todas las filas");
@@ -229,8 +249,7 @@ public class Main {
 		try {
 			switch (opcMesa) {
 			case 1:{
-				// se llama al metodo que lista las mesas con los parametros con valores predetrmindos
-				MetodosDataBase.listadoMesa("", null, "");
+				ejecutarOperacion(isDelete, "Mesa", null, null, null);
 				break;
 			}
 			case 2: {
@@ -239,11 +258,11 @@ public class Main {
 				
 				comparador = getComparadorDeseado();
 				
-				if (comprobarComparador(comparador, "LIKE")) {
+				if (!comprobarComparador(comparador, "LIKE")) {
 					System.out.println("Buscar un valor parecido no es posible en esta opción");
 				}
 				else {
-					MetodosDataBase.listadoMesa("idMesa", idMesa, comparador);
+					ejecutarOperacion(isDelete, "Mesa", "idMesa", idMesa, comparador);			
 				}
 				break;
 			}
@@ -255,7 +274,7 @@ public class Main {
 					System.out.println("Buscar un valor parecido no es posible en esta opción");
 				}
 				else {
-					MetodosDataBase.listadoMesa("numComensales", numComensales, comparador);
+					ejecutarOperacion(isDelete, "Mesa", "numComensales", numComensales, comparador);
 				}
 				
 				break;
@@ -265,9 +284,8 @@ public class Main {
 				String siNo = sc.next();
 				sc.nextLine();
 				String reserva = (siNo.equalsIgnoreCase("s"))? "1" : "0";
-
-				MetodosDataBase.listadoMesa("reserva", reserva, "=");				
 				
+				ejecutarOperacion(isDelete, "Mesa", "reserva", reserva, "=");						
 				break;
 			}	
 			}// switch Mesa
@@ -276,7 +294,7 @@ public class Main {
 			System.out.println("ERROR DE SINTAXIS, INSERTA BIEN LOS DATOS ");
 		}
 		catch(SQLException sqlE) {
-			System.out.println("ERROR SQL ");
+			System.out.println("ERROR SQL " + sqlE.getMessage());
 		}
 		catch(ClassNotFoundException connE) {
 			System.out.println("ERROR EN CONECTAR EN LA BASE DE DATOS ");
@@ -286,7 +304,7 @@ public class Main {
 		}
 	}
 	
-	private static void selectProductos() throws SQLException{
+	private static void selectProductos(boolean isDelete) throws SQLException{
 		int opcProductos;
 		String comparador;
 		System.out.println("1. Todas las filas");
@@ -300,7 +318,7 @@ public class Main {
 			switch (opcProductos) {
 			case 1:{
 				// se llama al metodo que lista las mesas con los parametros con valores predetrmindos
-				MetodosDataBase.listadoProductos("", null, "");
+				ejecutarOperacion(isDelete, "Productos", null, null, null);
 				break;
 			}
 			case 2: {
@@ -309,7 +327,7 @@ public class Main {
 				comparador = getComparadorDeseado();
 				
 				if (comprobarComparador(comparador, "LIKE")) {
-					MetodosDataBase.listadoProductos("idProducto", idProducto, comparador);
+					ejecutarOperacion(isDelete, "Productos", "idProducto", idProducto, comparador);
 				}
 				else {
 					System.out.println("Buscar un valor parecido no es posible en esta opción");
@@ -323,13 +341,11 @@ public class Main {
 				comparador = getComparadorDeseado();
 				
 				if (comprobarComparador(comparador, "<") && comprobarComparador(comparador, ">")) {
-					MetodosDataBase.listadoProductos("Denominacion", denominacion, comparador);
+					ejecutarOperacion(isDelete, "Productos", "Denominacion", denominacion, comparador);
 				}
 				else {
 					System.out.println("Buscar un valor parecido no es posible en esta opción");
-				}
-
-				
+				}		
 				break;
 			}
 			case 4:{
@@ -356,8 +372,9 @@ public class Main {
 		}
 	}// selectProductos
 
-	private static void selectFactura() throws SQLException{
+	private static void selectFactura(boolean isDelete) throws SQLException{
 		int opcFactura;
+		String comparador;
 		System.out.println("1. Todas las filas ");
 		System.out.println("2. Por id de la Factura ");
 		System.out.println("3. Por id de la Mesa ");
@@ -370,21 +387,37 @@ public class Main {
 			switch (opcFactura) {
 			case 1:{
 				// se llama al metodo que lista las mesas con los parametros con valores predetrmindos
-				MetodosDataBase.listadoFactura("", null);
+				ejecutarOperacion(isDelete, "Mesa", null, null, null);
 				break;
 			}
 			case 2: {
 				System.out.println("Inserta el id de la factura ");
 				String idFactura = sc.nextLine();
+				
+				comparador = getComparadorDeseado();
+				
+				if (comprobarComparador(comparador, "LIKE")) {
+					ejecutarOperacion(isDelete, "Factura", "idFactura", idFactura, comparador);
+				}
+				else {
+					System.out.println("Buscar un valor parecido no es posible en esta opción");
+				}
 
-				MetodosDataBase.listadoFactura("idFactura", idFactura);
 				break;
 			}
 			case 3:{
 				System.out.println("Inserta el nombre del producto ");
 				String idMesa = sc.nextLine();
+				
+				comparador = getComparadorDeseado();
+				
+				if (comprobarComparador(comparador, "LIKE")) {
+					ejecutarOperacion(isDelete, "Factura", "idMesa", idMesa, comparador);
+				}
+				else {
+					System.out.println("Buscar un valor parecido no es posible en esta opción");
+				}
 
-				MetodosDataBase.listadoFactura("idMesa", idMesa);
 				break;
 			}
 			case 4:{
@@ -401,15 +434,22 @@ public class Main {
 				}else {
 					tipoPago = "tarjeta";
 				}
-						
-				MetodosDataBase.listadoFactura("tipoPago", tipoPago);
+				
+				ejecutarOperacion(isDelete, "Factura", "tipoPago", tipoPago, "=");
 				break;
 			}	
 			case 5:{
 				System.out.println("Inserta el importe");
 				String importe = sc.nextLine();
-
-				MetodosDataBase.listadoFactura("Importe", importe);
+				
+				comparador = getComparadorDeseado();
+				
+				if (comprobarComparador(comparador, "LIKE")) {
+					ejecutarOperacion(isDelete, "Factura", "Importe", importe, comparador);
+				}
+				else {
+					System.out.println("Buscar un valor parecido no es posible en esta opción");
+				}
 				break;
 			}
 			}// switch Facturas
@@ -428,8 +468,9 @@ public class Main {
 		}
 	}// selectFacturas
 	
-	private static void selectPedido() throws SQLException{
+	private static void selectPedido(boolean isDelete) throws SQLException{
 		int opcPedido;
+		String comparador;
 		System.out.println("1. Todas las filas ");
 		System.out.println("2. Por id del pedido ");
 		System.out.println("3. Por id de la Factura ");
@@ -443,35 +484,65 @@ public class Main {
 			switch (opcPedido) {
 			case 1:{
 				// se llama al metodo que lista las mesas con los parametros con valores predetrmindos
-				MetodosDataBase.listadoPedido("", null);
+				ejecutarOperacion(isDelete, "Pedido", null, null, null);
+
 				break;
 			}
 			case 2:{
 				System.out.println("Inserta el id del pedido ");
 				String idPedido = sc.nextLine();
+				
+				comparador = getComparadorDeseado();
+				
+				if (comprobarComparador(comparador, "LIKE")) {
+					ejecutarOperacion(isDelete, "Pedido", "idPedido", idPedido, comparador);
+				}
+				else {
+					System.out.println("Buscar un valor parecido no es posible en esta opción");
+				}
 
-				MetodosDataBase.listadoPedido("idPedido", idPedido);
 				break;
 			}
 			case 3: {
 				System.out.println("Inserta el id de la factura ");
 				String idFactura = sc.nextLine();
-
-				MetodosDataBase.listadoPedido("idFactura", idFactura);
+				
+				comparador = getComparadorDeseado();
+				
+				if (comprobarComparador(comparador, "LIKE")) {
+					ejecutarOperacion(isDelete, "Pedido", "idFactura", idFactura, comparador);
+				}
+				else {
+					System.out.println("Buscar un valor parecido no es posible en esta opción");
+				}
 				break;
 			}
 			case 4:{
 				System.out.println("Inserta el id del producto ");
 				String idProducto = sc.nextLine();
-
-				MetodosDataBase.listadoPedido("idProducto", idProducto);
+				
+				comparador = getComparadorDeseado();
+				
+				if (comprobarComparador(comparador, "LIKE")) {
+					ejecutarOperacion(isDelete, "Pedido", "idProducto", idProducto, comparador);
+				}
+				else {
+					System.out.println("Buscar un valor parecido no es posible en esta opción");
+				}
 				break;
 			}
 			case 5:{
 				System.out.println("Inserta la cantidad");
 				String cantidad = sc.nextLine();
-
-				MetodosDataBase.listadoPedido("Cantidad", cantidad);
+				
+				comparador = getComparadorDeseado();
+				
+				if (comprobarComparador(comparador, "LIKE")) {
+					ejecutarOperacion(isDelete, "Pedido", "Cantidad", cantidad, comparador);
+				}
+				else {
+					System.out.println("Buscar un valor parecido no es posible en esta opción");
+				}
 				break;
 			}
 			}// switch Facturas
@@ -536,30 +607,24 @@ public class Main {
 
 
 	// FUNCIONES PARA REALIZAR LAS MODIFICACIONES
-	static void modificarMesa() {
-		int idMesa = 0;
-		int opcMesa = 0;
+	static void modificarTabla(String tabla) {
+		int id = 0;
+		String columna;
 		String nuevoValor;
-		System.out.println("Inserta el id del elemento a modificar");
-		idMesa = sc.nextInt();
-		sc.nextLine();
-		System.out.println("1. Numero de Comensales");
-		System.out.println("2. Reserva");
-		System.out.println("Inserta el valor a modificarr");
-		opcMesa = sc.nextInt();
-		sc.nextLine();
-		System.out.println("Inserta el nuevo valor");
-		nuevoValor = sc.nextLine();
 		
-		try {
-			switch (opcMesa) {
-			case 1: {
-				MetodosDataBase.modificar("Mesa", "numComensales", idMesa, nuevoValor);
-				break;
-			}
-			default:
-				System.out.println("Opción no válida");
-			}
+		try {			
+			System.out.println("Inserta el id del elemento a modificar");
+			id = sc.nextInt();
+			sc.nextLine();
+			
+			System.out.println(MetodosDataBase.getColumnasTabla(tabla));
+			System.out.println("Inserta el valor a modificar (ESCRIBE EL NOMBRE COMPLETO)");
+			columna = sc.nextLine();
+			System.out.println("Inserta el nuevo valor");
+			nuevoValor = sc.nextLine();
+			
+			MetodosDataBase.modificar(tabla, columna, id, nuevoValor);
+			
 		}
 		catch(SQLSyntaxErrorException syntaxE) {
 			System.out.println("ERROR DE SINTAXIS, INSERTA BIEN LOS DATOS ");
@@ -574,73 +639,147 @@ public class Main {
 			System.out.println("ERROR INESPERADO");
 		}
 	}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+	
+	
+	static void eliminarDatos() {
+	int opc = 0;
+		
+		System.out.println("1. Tabla Mesa");
+		System.out.println("2. Tabla Productos");
+		System.out.println("3. Tabla Factura");
+		System.out.println("4. Tabla Pedido");
+		System.out.println("Elige sobre que tabla quieres realizar una modificacion ");
+		opc = sc.nextInt();
+		sc.nextLine();
+		
+		try {
+			switch (opc) {
+			case 1: {
+				selectMesa(true);
+				break;
+			}
+			case 2: {
+				//MetodosDataBase.borrarTabla("Productos");
+				break;
+			}
+			case 3: {
+				//MetodosDataBase.borrarTabla("Factura");
+				break;
+			}
+			case 4: {
+				selectProductos(true);
+				break;
+			}
+			default:
+				System.out.println("Opción no válida");
+			}
+		}
+		catch(SQLSyntaxErrorException syntaxE) {
+			System.out.println("ERROR DE SINTAXIS, INSERTA BIEN LOS DATOS ");
+		}
+		catch(SQLException sqlE) {
+			System.out.println("ERROR SQL " + sqlE.getMessage());
+		}
+		catch(Exception e) {
+			System.out.println("ERROR INESPERADO");
+		}
+		
+		
+	}// eliminar datos
+	
+	// funcion para borrar las tablas de la base de datos
+	static void borrarTabla() {
+		int opc = 0;
+			
+		System.out.println("1. Tabla Mesa");
+		System.out.println("2. Tabla Productos");
+		System.out.println("3. Tabla Factura");
+		System.out.println("4. Tabla Pedido");
+		System.out.println("Elige que tabla quieres borrar ");
+		opc = sc.nextInt();
+		sc.nextLine();
+			
+		try {
+			switch (opc) {
+				case 1: {
+					if (MetodosDataBase.borrarTabla("Mesa")) {
+						System.out.println("Tabla borrada correctamente ");
+					}
+					else {
+						System.out.println("No se pudo borrar");
+					}
+					break;
+				}
+				case 2: {
+					if (MetodosDataBase.borrarTabla("Productos")) {
+						System.out.println("Tabla borrada correctamente ");
+					}
+					else {
+						System.out.println("No se pudo borrar");
+					}
+					break;
+				}
+				case 3: {
+					if (MetodosDataBase.borrarTabla("Factura")) {
+						System.out.println("Tabla borrada correctamente ");
+					}
+					else {
+						System.out.println("No se pudo borrar");
+					}
+					break;
+				}
+				case 4: {
+					if (MetodosDataBase.borrarTabla("Pedido")) {
+						System.out.println("Tabla borrada correctamente ");
+					}
+					else {
+						System.out.println("No se pudo borrar");
+					}
+					break;
+				}
+				default:
+					System.out.println("Opción no válida");
+			}
+		}
+		catch(SQLSyntaxErrorException syntaxE) {
+			System.out.println("ERROR DE SINTAXIS, INSERTA BIEN LOS DATOS ");
+		}
+		catch(SQLException sqlE) {
+			System.out.println("ERROR SQL " + sqlE.getMessage());
+		}
+		catch(ClassNotFoundException connE) {
+			System.out.println("ERROR EN CONECTAR EN LA BASE DE DATOS ");
+		}
+		catch(Exception e) {
+			System.out.println("ERROR INESPERADO");
+		}
+	}// borrar tabla
+	
+	
+	// funcion qeu se encarga de hacer un select o un delete segun de donde se llame a la funcion
+	private static void ejecutarOperacion(boolean isDelete, String tabla, String columna, String valor, String comparador) 
+	        throws SQLException, ClassNotFoundException {
+	    if (isDelete) {
+	        MetodosDataBase.borrarDatosTabla(tabla, columna, valor, comparador);
+	    } else {
+	    	switch (tabla) {
+            case "Mesa":
+                MetodosDataBase.listadoMesa(columna, valor, comparador);
+                break;
+            case "Productos":
+                MetodosDataBase.listadoProductos(columna, valor, comparador);
+                break;
+            case "Factura":
+            	MetodosDataBase.listadoFactura(columna, valor, comparador);
+            	break;
+            case "Pedido":
+            	MetodosDataBase.listadoPedido(columna, valor, comparador);
+            	break;
+            // Agrega más casos según las tablas que tengas
+            default:
+                throw new IllegalArgumentException("No se reconoce la tabla: " + tabla);
+        }
+	    }
+	}
 
 }

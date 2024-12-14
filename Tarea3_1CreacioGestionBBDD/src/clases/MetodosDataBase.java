@@ -8,6 +8,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.sql.SQLSyntaxErrorException;
 import java.sql.Statement;
 import java.util.Scanner;
@@ -280,7 +281,7 @@ public class MetodosDataBase {
 
 	}// listado productos
 
-	public static void listadoFactura(String columna, String datoFiltrar) throws SQLException, SQLSyntaxErrorException, ClassNotFoundException {
+	public static void listadoFactura(String columna, String datoFiltrar, String comparador) throws SQLException, SQLSyntaxErrorException, ClassNotFoundException {
 		Connection conn = null;
 		Statement stmt = null;
 		ResultSet lista = null;
@@ -292,7 +293,12 @@ public class MetodosDataBase {
 		if (datoFiltrar == null) {
 			sql = "SELECT * FROM Factura";
 		} else {
-			sql = "SELECT * FROM Factura WHERE " + columna + " = " + datoFiltrar;
+			if (comparador.equals("LIKE")) {
+				sql = "SELECT * FROM Factura WHERE " + columna + "  " + comparador +" " + "%"+datoFiltrar+"%";				
+			}
+			else {
+				sql = "SELECT * FROM Factura WHERE " + columna + "  " + comparador +" " + datoFiltrar;				
+			}
 		}
 
 		lista = stmt.executeQuery(sql);
@@ -315,7 +321,7 @@ public class MetodosDataBase {
 
 	}// listaFactura
 
-	public static void listadoPedido(String columna, String datoFiltrar) throws SQLException, SQLSyntaxErrorException, ClassNotFoundException {
+	public static void listadoPedido(String columna, String datoFiltrar, String comparador) throws SQLException, SQLSyntaxErrorException, ClassNotFoundException {
 		Connection conn = null;
 		Statement stmt = null;
 		ResultSet lista = null;
@@ -326,8 +332,15 @@ public class MetodosDataBase {
 		if (datoFiltrar == null) {
 			sql = "SELECT * FROM Pedido";
 		} else {
-			sql = "SELECT * FROM Pedido WHERE " + columna + " = " + datoFiltrar;
+			if (comparador.equals("LIKE")) {
+				sql = "SELECT * FROM Pedido WHERE " + columna + "  " + comparador +" " + "%"+datoFiltrar+"%";				
+			}
+			else {
+				sql = "SELECT * FROM Pedido WHERE " + columna + "  " + comparador +" " + datoFiltrar;				
+			}
 		}
+		
+
 
 		lista = stmt.executeQuery(sql);
 
@@ -366,18 +379,17 @@ public class MetodosDataBase {
 			default -> throw new IllegalArgumentException("Unexpected value: " + tabla);
 		};
 		
-		
-		
 		conn = ConexionDB.conectar();
 		conn.setAutoCommit(false);
 		stmt = conn.createStatement();
 		sql =     "Update " + tabla
 				+ " Set " + columna + " = " + nuevoValor
 				+ " Where " + nombreId + " = " + id ;
-		lista = stmt.executeQuery(sql);
+		stmt.executeUpdate(sql);
 		
-		sql = "Select * FROM " + tabla + "WHERE " + nombreId + " = " + id;
-
+		sql = "Select * FROM " + tabla + " WHERE " + nombreId + " = " + id;
+		
+		lista = stmt.executeQuery(sql);
 		ResultSetMetaData metaData = lista.getMetaData();
 		int columnCount = metaData.getColumnCount();
 
@@ -412,7 +424,121 @@ public class MetodosDataBase {
 		// Paso 5. Cerrar el objeto en uso y la conexión
 		stmt.close();
 		conn.close();
-		sc.close();
-	}
+		//sc.close();
+	}// modificar
+	
+	public static String getColumnasTabla(String tabla) throws SQLException, SQLSyntaxErrorException, ClassNotFoundException {
+		Connection conn = null;
+		Statement stmt = null;
+		ResultSet lista = null;
+		String sql = "";
 
+		conn = ConexionDB.conectar();
+		// hacemos que para que se guarden los cambios se necesite hacer un commit
+		conn.setAutoCommit(false);
+		stmt = conn.createStatement();
+		
+		sql = "SELECT * FROM " + tabla + " LIMIT 1";
+
+		lista = stmt.executeQuery(sql);
+		
+		ResultSetMetaData metaData = lista.getMetaData();
+		int columnCount = metaData.getColumnCount();
+		String columnas = "";
+		
+		while (lista.next()) {
+			// Recorrer todas las columnas de la fila actual
+			for (int col = 1; col <= columnCount; col++) {
+				columnas += col + ". " + metaData.getColumnName(col) + "\n";
+			} // for
+		}
+		stmt.close();
+		conn.close();
+		return columnas;
+	}// getColumnas
+	
+	public static void borrarDatosTabla(String tabla, String columna, String datoFiltrar, String comparador) throws SQLException, SQLSyntaxErrorException,
+																							   ClassNotFoundException, SQLIntegrityConstraintViolationException  {
+		Scanner sc = new Scanner(System.in);
+		Connection conn = null;
+		Statement stmt = null;
+		ResultSet lista = null;
+		String sql = "";
+		int opc;
+
+		conn = ConexionDB.conectar();
+		stmt = conn.createStatement();
+		
+		if (datoFiltrar != null) {
+			sql = "DELETE FROM " + tabla + " WHERE "+ columna + " " + comparador + " " + datoFiltrar;
+		}
+		else {
+			sql = "DELETE FROM " + tabla;
+		}
+		
+		stmt.executeUpdate(sql);
+		
+		sql = "Select * FROM " + tabla;
+		
+		lista = stmt.executeQuery(sql);
+		ResultSetMetaData metaData = lista.getMetaData();
+		int columnCount = metaData.getColumnCount();
+
+		while (lista.next()) {
+			// Recorrer todas las columnas de la fila actual
+			System.out.println("----------------------------");
+			for (int col = 1; col <= columnCount; col++) {
+				System.out.print(metaData.getColumnName(col) + ": " + lista.getString(col) + "\n");
+			} // for
+			System.out.println();
+		} // while
+		
+		System.out.println("1. Confirmar cambios ");
+		System.out.println("2. Deshacer cambios ");
+		System.out.println("Quieres borrar esos datos? ");
+		opc = sc.nextInt();
+		sc.nextLine();
+		
+		switch (opc) {
+		case 1: {
+			conn.commit();
+			break;
+		}
+		case 2: {
+			conn.rollback();
+			break;
+		}
+		default:
+			throw new IllegalArgumentException("Unexpected value: " + opc);
+		}
+		stmt.close();
+		conn.close();
+		
+	}// borrar datos tabla
+	
+	
+	public static boolean borrarTabla(String tabla)throws SQLException, SQLSyntaxErrorException,
+	   											ClassNotFoundException {
+
+		Connection conn = null;
+		Statement stmt = null;
+		String sql = "";
+		boolean creada = false;
+
+		conn = ConexionDB.conectar();
+		stmt = conn.createStatement();
+		
+
+		sql = "Drop table " + tabla;
+		
+		
+		stmt.executeUpdate(sql);
+		
+		creada = true;
+		
+		stmt.close();
+		conn.close();
+		
+		return creada;
+	}		
 }
