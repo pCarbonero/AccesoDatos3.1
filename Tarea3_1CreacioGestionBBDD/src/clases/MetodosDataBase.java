@@ -314,7 +314,7 @@ public class MetodosDataBase {
 	public static void listadoPedido(String columna, String datoFiltrar, String comparador) throws SQLException, SQLSyntaxErrorException, ClassNotFoundException {
 		Connection conn = null;
 		Statement stmt = null;
-		ResultSet lista = null;
+		ResultSet lista = null; 
 		String sql = "";
 
 		conn = ConexionDB.conectar();
