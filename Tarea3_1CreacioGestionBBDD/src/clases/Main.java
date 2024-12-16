@@ -65,7 +65,7 @@ public class Main {
 	}// menu
 
 	// FUncion que muestra las opciones de creacion de tablas
-	static void crearTablas() throws SQLException {
+	static void crearTablas() {
 		int opc = 0;
 
 		System.out.println("1. Crear todas las tablas ");
@@ -77,45 +77,58 @@ public class Main {
 		opc = sc.nextInt();
 		sc.nextLine();	
 		
-		switch (opc) {
-		case 1: {
-			MetodosDataBase.crearTablaMesa();
-			MetodosDataBase.crearTablaProductos();
-			MetodosDataBase.crearTablaFactura();
-			MetodosDataBase.crearTablaPedido();
-			break;
-		}	
-		case 2:{
-			MetodosDataBase.crearTablaMesa();
-			break;
-		}
-		case 3:{
-			MetodosDataBase.crearTablaProductos();
-			break;
-		}
-		case 4:{
-			if(MetodosDataBase.crearTablaFactura()) {
-				System.out.println("Tabla creada correctamente");
+		try {
+			switch (opc) {
+			case 1: {
+				MetodosDataBase.crearTablaMesa();
+				MetodosDataBase.crearTablaProductos();
+				MetodosDataBase.crearTablaFactura();
+				MetodosDataBase.crearTablaPedido();
+				break;
+			}	
+			case 2:{
+				MetodosDataBase.crearTablaMesa();
+				break;
 			}
-			else {
-				System.out.println("Necesitas crear la tabla Mesa");
+			case 3:{
+				MetodosDataBase.crearTablaProductos();
+				break;
 			}
-			break;
+			case 4:{
+				if(MetodosDataBase.crearTablaFactura()) {
+					System.out.println("Tabla creada correctamente");
+				}
+				else {
+					System.out.println("Necesitas crear la tabla Mesa");
+				}
+				break;
+			}
+			case 5:{
+				if(MetodosDataBase.crearTablaPedido()) {
+					System.out.println("Tabla creada correctamente");
+				}
+				else {
+					System.out.println("Necesitas crear las tablas Factura y Productos");
+				}
+				break;
+			}
+			}// switch
 		}
-		case 5:{
-			if(MetodosDataBase.crearTablaPedido()) {
-				System.out.println("Tabla creada correctamente");
-			}
-			else {
-				System.out.println("Necesitas crear las tablas Factura y Productos");
-			}
-			break;
+		catch(SQLSyntaxErrorException syntaxE) {
+			System.out.println("ERROR DE SINTAXIS, ASEGURATE DE QUE LA TABLA NO ESTÉ CREADA ");
 		}
-
-		}// switch
+		catch(SQLException sqlE) {
+			System.out.println("ERROR SQL " + sqlE.getMessage());
+		}
+		catch(ClassNotFoundException connE) {
+			System.out.println("ERROR EN CONECTAR EN LA BASE DE DATOS ");
+		}
+		catch(Exception e) {
+			System.out.println("ERROR INESPERADO");
+		}
 	}// crear tablas
 
-	static void insertarDatos() throws SQLException {
+	static void insertarDatos() {
 		int opc = -1;
 
 			System.out.println("1. Insertar en todas las tablas ");
@@ -127,40 +140,54 @@ public class Main {
 			opc = sc.nextInt();
 			sc.nextLine();
 			
-			switch (opc) {
-			case 1: {
-				MetodosDataBase.insertarElementos("Mesa");
-				MetodosDataBase.insertarElementos("Productos");
-				MetodosDataBase.insertarElementos("Factura");
-				MetodosDataBase.insertarElementos("Pedido");
-				break;
-			}	
-			case 2:{
-				MetodosDataBase.insertarElementos("Mesa");
-				break;
-			}
-			case 3:{
-				MetodosDataBase.insertarElementos("Productos");
-				break;
-			}
-			case 4:{
-				if(MetodosDataBase.insertarElementos("Factura")) {
-					System.out.println("Datos insertados correctamente");
+			try {
+				switch (opc) {
+				case 1: {
+					MetodosDataBase.insertarElementos("Mesa");
+					MetodosDataBase.insertarElementos("Productos");
+					MetodosDataBase.insertarElementos("Factura");
+					MetodosDataBase.insertarElementos("Pedido");
+					break;
+				}	
+				case 2:{
+					MetodosDataBase.insertarElementos("Mesa");
+					break;
 				}
-				else {
-					System.out.println("Necesitas crear la tabla Mesa");
+				case 3:{
+					MetodosDataBase.insertarElementos("Productos");
+					break;
 				}
-				break;
+				case 4:{
+					if(MetodosDataBase.insertarElementos("Factura")) {
+						System.out.println("Datos insertados correctamente");
+					}
+					else {
+						System.out.println("Necesitas crear la tabla Mesa");
+					}
+					break;
+				}
+				case 5:{
+					if(MetodosDataBase.insertarElementos("Pedido")) {
+						System.out.println("Datos insertados correctamente");
+					}
+					else {
+						System.out.println("Necesitas crear las tablas Factura y Productos");
+					}
+					break;
+				}
+				}
 			}
-			case 5:{
-				if(MetodosDataBase.insertarElementos("Pedido")) {
-					System.out.println("Datos insertados correctamente");
-				}
-				else {
-					System.out.println("Necesitas crear las tablas Factura y Productos");
-				}
-				break;
+			catch(SQLSyntaxErrorException syntaxE) {
+				System.out.println("ERROR DE SINTAXI");
 			}
+			catch(SQLException sqlE) {
+				System.out.println("ERROR SQL " + sqlE.getMessage());
+			}
+			catch(ClassNotFoundException connE) {
+				System.out.println("ERROR EN CONECTAR EN LA BASE DE DATOS ");
+			}
+			catch(Exception e) {
+				System.out.println("ERROR INESPERADO");
 			}
 	}// insertar
 	
@@ -568,6 +595,7 @@ public class Main {
 		}
 	}// selectFacturas
 
+	// funcion para obtener con que comparadaor se quiere filtrar la informacion para una consulta
 	private static String getComparadorDeseado() {
 		int opcOp;
 		String comparador = "=";
