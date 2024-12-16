@@ -181,6 +181,7 @@ public class MetodosDataBase {
 			while ((line = br.readLine()) != null) {
 				stmt.execute(line);
 			}
+			insertado = true;
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -251,13 +252,7 @@ public class MetodosDataBase {
 		if (datoFiltrar == null) {
 			sql = "SELECT * FROM Productos";
 		} else {
-			if (comparador.equals("LIKE")) {
-				sql = "SELECT * FROM Productos WHERE " + columna + "  " + comparador +" " + "%"+datoFiltrar+"%";				
-			}
-			else {
-				sql = "SELECT * FROM Productos WHERE " + columna + "  " + comparador +" " + datoFiltrar;				
-			}
-
+			sql = "SELECT * FROM Productos WHERE " + columna + "  " + comparador +" " + datoFiltrar;				
 		}
 
 		lista = stmt.executeQuery(sql);
@@ -293,12 +288,7 @@ public class MetodosDataBase {
 		if (datoFiltrar == null) {
 			sql = "SELECT * FROM Factura";
 		} else {
-			if (comparador.equals("LIKE")) {
-				sql = "SELECT * FROM Factura WHERE " + columna + "  " + comparador +" " + "%"+datoFiltrar+"%";				
-			}
-			else {
-				sql = "SELECT * FROM Factura WHERE " + columna + "  " + comparador +" " + datoFiltrar;				
-			}
+			sql = "SELECT * FROM Factura WHERE " + columna + "  " + comparador + " " + datoFiltrar;					
 		}
 
 		lista = stmt.executeQuery(sql);
@@ -332,12 +322,7 @@ public class MetodosDataBase {
 		if (datoFiltrar == null) {
 			sql = "SELECT * FROM Pedido";
 		} else {
-			if (comparador.equals("LIKE")) {
-				sql = "SELECT * FROM Pedido WHERE " + columna + "  " + comparador +" " + "%"+datoFiltrar+"%";				
-			}
-			else {
-				sql = "SELECT * FROM Pedido WHERE " + columna + "  " + comparador +" " + datoFiltrar;				
-			}
+			sql = "SELECT * FROM Pedido WHERE " + columna + "  " + comparador +" " + datoFiltrar;						
 		}
 		
 
@@ -467,6 +452,7 @@ public class MetodosDataBase {
 		int opc;
 
 		conn = ConexionDB.conectar();
+		conn.setAutoCommit(false);
 		stmt = conn.createStatement();
 		
 		if (datoFiltrar != null) {

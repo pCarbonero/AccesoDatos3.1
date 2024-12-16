@@ -145,7 +145,7 @@ public class Main {
 			}
 			case 4:{
 				if(MetodosDataBase.insertarElementos("Factura")) {
-					System.out.println("Tabla creada correctamente");
+					System.out.println("Datos insertados correctamente");
 				}
 				else {
 					System.out.println("Necesitas crear la tabla Mesa");
@@ -154,7 +154,7 @@ public class Main {
 			}
 			case 5:{
 				if(MetodosDataBase.insertarElementos("Pedido")) {
-					System.out.println("Tabla creada correctamente");
+					System.out.println("Datos insertados correctamente");
 				}
 				else {
 					System.out.println("Necesitas crear las tablas Factura y Productos");
@@ -178,19 +178,19 @@ public class Main {
 		
 		switch (opc) {
 		case 1: {
-			selectMesa(false);
+			selectDeleteMesa(false);
 			break;
 		}
 		case 2:{
-			selectProductos(false);
+			selectDeleteProductos(false);
 			break;
 		}
 		case 3:{
-			selectFactura(false);
+			selectDeleteFactura(false);
 			break;
 		}
 		case 4:
-			selectPedido(false);
+			selectDeletePedido(false);
 			break;
 		default:
 			System.out.println("Opción no válida");
@@ -234,7 +234,7 @@ public class Main {
 
 	
 	// funcines para realizar los select y eliminar datos en la base de datos
-	private static void selectMesa(boolean isDelete) {
+	private static void selectDeleteMesa(boolean isDelete) {
 		int opcMesa;
 		String comparador;
 		System.out.println("1. Todas las filas");
@@ -304,7 +304,7 @@ public class Main {
 		}
 	}
 	
-	private static void selectProductos(boolean isDelete) throws SQLException{
+	private static void selectDeleteProductos(boolean isDelete) throws SQLException{
 		int opcProductos;
 		String comparador;
 		System.out.println("1. Todas las filas");
@@ -341,6 +341,13 @@ public class Main {
 				comparador = getComparadorDeseado();
 				
 				if (comprobarComparador(comparador, "<") && comprobarComparador(comparador, ">")) {
+					if (comparador.equals("LIKE")) {
+						denominacion = "'%"+denominacion+"%'";
+					}
+					else {
+						denominacion = "'"+denominacion+"'";
+					}
+					
 					ejecutarOperacion(isDelete, "Productos", "Denominacion", denominacion, comparador);
 				}
 				else {
@@ -372,7 +379,7 @@ public class Main {
 		}
 	}// selectProductos
 
-	private static void selectFactura(boolean isDelete) throws SQLException{
+	private static void selectDeleteFactura(boolean isDelete) throws SQLException{
 		int opcFactura;
 		String comparador;
 		System.out.println("1. Todas las filas ");
@@ -430,9 +437,9 @@ public class Main {
 				sc.nextLine();
 				
 				if (opcPago == 1) {
-					tipoPago = "efectivo";
+					tipoPago = "'efectivo'";
 				}else {
-					tipoPago = "tarjeta";
+					tipoPago = "'tarjeta'";
 				}
 				
 				ejecutarOperacion(isDelete, "Factura", "tipoPago", tipoPago, "=");
@@ -468,7 +475,7 @@ public class Main {
 		}
 	}// selectFacturas
 	
-	private static void selectPedido(boolean isDelete) throws SQLException{
+	private static void selectDeletePedido(boolean isDelete) throws SQLException{
 		int opcPedido;
 		String comparador;
 		System.out.println("1. Todas las filas ");
@@ -655,19 +662,19 @@ public class Main {
 		try {
 			switch (opc) {
 			case 1: {
-				selectMesa(true);
+				selectDeleteMesa(true);
 				break;
 			}
 			case 2: {
-				//MetodosDataBase.borrarTabla("Productos");
+				selectDeleteProductos(true);
 				break;
 			}
 			case 3: {
-				//MetodosDataBase.borrarTabla("Factura");
+				selectDeleteFactura(true);
 				break;
 			}
 			case 4: {
-				selectProductos(true);
+				selectDeletePedido(true);
 				break;
 			}
 			default:
